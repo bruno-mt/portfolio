@@ -9,42 +9,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Page-specific overrides */
     body { background: var(--gray-100); }
   </style>
 </head>
 <body class="viewer-body">
 
-  <!-- Top nav bar -->
   <div class="viewer-header">
-    <a href="index.html" class="viewer-back">
+    <!-- On desktop: always "Back to portfolio". On mobile: toggles to "Back to inbox" when reading. -->
+    <a id="header-back" href="index.html" class="viewer-back">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M8.5 2.5L4 7L8.5 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Back to portfolio
+      <span id="header-back-label">Back to portfolio</span>
     </a>
     <span class="viewer-title" id="viewer-title"></span>
   </div>
 
-  <!-- Two-panel layout -->
-  <div class="viewer-layout">
-
-    <!-- Left: Inbox sidebar -->
+  <div class="viewer-layout" id="viewer-layout">
     <aside class="inbox-sidebar" id="inbox-sidebar">
       <div class="inbox-header">Inbox</div>
-      <!-- Items injected by JS -->
     </aside>
-
-    <!-- Right: Reading pane -->
-    <main class="reading-pane" id="reading-pane">
-      <!-- Email card injected by JS -->
-    </main>
-
+    <main class="reading-pane" id="reading-pane"></main>
   </div>
 
   <script src="emails.js"></script>
   <script>
-    // ── Resolve sequence from ?seq= param ──────────────────────────────
     const params = new URLSearchParams(window.location.search);
     const seqId  = params.get('seq') || (sequences[0] && sequences[0].id);
     const seq    = sequences.find(s => s.id === seqId) || sequences[0];
@@ -57,23 +46,55 @@
     document.title = seq.title + ' — Email Viewer';
     document.getElementById('viewer-title').textContent = seq.title;
 
-    // ── Build inbox items ───────────────────────────────────────────────
-    const sidebar = document.getElementById('inbox-sidebar');
+    // ── Read / unread tracking ──────────────────────────────────────────
+    const opened = new Set(); // tracks which indexes have been opened
 
+    // ── Mobile state ────────────────────────────────────────────────────
+    // "inbox" = showing sidebar full-screen; "reading" = showing pane full-screen
+    let mobileState = 'inbox';
+    const isMobile = () => window.innerWidth <= 768;
+
+    const layout      = document.getElementById('viewer-layout');
+    const sidebar     = document.getElementById('inbox-sidebar');
+    const pane        = document.getElementById('reading-pane');
+    const backLink    = document.getElementById('header-back');
+    const backLabel   = document.getElementById('header-back-label');
+
+    function setMobileState(state) {
+      mobileState = state;
+      if (!isMobile()) return;
+      if (state === 'inbox') {
+        layout.classList.remove('mobile-reading');
+        backLink.href = 'index.html';
+        backLabel.textContent = 'Back to portfolio';
+      } else {
+        layout.classList.add('mobile-reading');
+        backLink.href = '#';
+        backLabel.textContent = 'Back to inbox';
+        backLink.onclick = (e) => { e.preventDefault(); setMobileState('inbox'); };
+      }
+    }
+
+    // On desktop the back link always goes to portfolio
+    backLink.addEventListener('click', (e) => {
+      if (isMobile() && mobileState === 'reading') {
+        e.preventDefault();
+        setMobileState('inbox');
+      }
+    });
+
+    // ── Build inbox items ───────────────────────────────────────────────
     function buildInboxItem(index) {
-      // index -1 = overview
       const isOverview = index === -1;
       const item = document.createElement('div');
-      item.className = 'inbox-item' + (isOverview ? ' overview-item' : '');
+      item.className = 'inbox-item' + (isOverview ? ' overview-item' : '') + ' unread';
       item.dataset.index = index;
 
       if (isOverview) {
         item.innerHTML = `
-          <div class="inbox-sender">
-            <span>${seq.sender.name}</span>
-          </div>
+          <div class="inbox-sender"><span>${seq.sender.name}</span></div>
           <div class="inbox-subject">Sequence Overview</div>
-          <div class="inbox-preview">Brief, structure & approach</div>
+          <div class="inbox-preview">Brief, structure &amp; approach</div>
         `;
       } else {
         const email = seq.emails[index];
@@ -91,35 +112,37 @@
       return item;
     }
 
-    // Overview first, then emails
     sidebar.appendChild(buildInboxItem(-1));
     seq.emails.forEach((_, i) => sidebar.appendChild(buildInboxItem(i)));
 
-    // ── Render email/overview ───────────────────────────────────────────
-    const pane = document.getElementById('reading-pane');
-
+    // ── Select & render ─────────────────────────────────────────────────
     function selectItem(index) {
-      // Update active state
+      // Mark as read
+      opened.add(index);
       document.querySelectorAll('.inbox-item').forEach(el => {
-        el.classList.toggle('active', parseInt(el.dataset.index) === index);
+        const i = parseInt(el.dataset.index);
+        el.classList.toggle('active', i === index);
+        el.classList.toggle('unread', !opened.has(i));
       });
 
-      if (index === -1) {
-        renderOverview();
-      } else {
-        renderEmail(seq.emails[index]);
-      }
+      if (index === -1) renderOverview();
+      else renderEmail(seq.emails[index]);
+
       pane.scrollTop = 0;
+
+      if (isMobile()) setMobileState('reading');
     }
 
     function renderOverview() {
-      const ov = seq.overview;
       pane.innerHTML = `
         <div class="email-card overview-card">
           <div class="email-header">
             <div class="email-subject" style="font-size:17px;color:#64748b;font-weight:500;margin-bottom:0;">Overview</div>
           </div>
-          <div class="email-body">${ov.body}</div>
+          <div class="email-body">${seq.overview.body.replace(
+            'Start with Email 1 →',
+            '<a href="#" onclick="event.preventDefault();selectItem(0);return false;" style="color:#3b82f6;">Start with Email 1 →</a>'
+          )}</div>
         </div>
       `;
     }
@@ -163,14 +186,18 @@
     function toggleNotes(btn) {
       const expanded = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!expanded));
-      const body = btn.nextElementSibling;
-      body.classList.toggle('open', !expanded);
+      btn.nextElementSibling.classList.toggle('open', !expanded);
     }
-    // Expose globally for onclick
     window.toggleNotes = toggleNotes;
+    window.selectItem  = selectItem;
 
-    // ── Load overview by default ────────────────────────────────────────
-    selectItem(-1);
+    // ── Initial state ───────────────────────────────────────────────────
+    // Desktop: open overview. Mobile: show inbox only.
+    if (isMobile()) {
+      setMobileState('inbox');
+    } else {
+      selectItem(-1);
+    }
   </script>
 </body>
 </html>

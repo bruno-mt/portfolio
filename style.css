@@ -521,26 +521,63 @@ a.cta-button:hover { background: var(--blue-hover); }
   gap: 6px;
 }
 
+/* ─── Unread / read state ─── */
+.inbox-item.unread .inbox-sender > span:first-child,
+.inbox-item.unread .inbox-subject {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.inbox-item:not(.unread) .inbox-sender > span:first-child,
+.inbox-item:not(.unread) .inbox-subject {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
 /* ─── Mobile ─── */
 @media (max-width: 768px) {
   .site-header { padding: 40px 0 48px; }
   .site-name { font-size: 22px; }
 
+  /* Default mobile: inbox fills the screen, reading pane hidden */
   .viewer-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-    height: auto;
-    min-height: calc(100vh - 57px);
+    display: block;
+    height: calc(100vh - 57px);
+    position: relative;
+    overflow: hidden;
   }
 
   .inbox-sidebar {
-    height: auto;
-    max-height: 40vh;
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    max-height: none;
     border-right: none;
-    border-bottom: 1px solid var(--gray-200);
+    overflow-y: auto;
+    transition: transform .25s ease;
+    transform: translateX(0);
+    z-index: 2;
   }
 
-  .reading-pane { padding: 16px; }
+  .reading-pane {
+    position: absolute;
+    inset: 0;
+    padding: 16px;
+    overflow-y: auto;
+    transition: transform .25s ease;
+    transform: translateX(100%);
+    z-index: 1;
+  }
+
+  /* When an email is selected: slide inbox out, reading pane in */
+  .viewer-layout.mobile-reading .inbox-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .viewer-layout.mobile-reading .reading-pane {
+    transform: translateX(0);
+  }
+
   .email-body { padding: 20px 20px 24px; }
   .email-header { padding: 20px 20px 16px; }
   .email-subject { font-size: 17px; }
