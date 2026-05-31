@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Copywriter for AI SaaS</title>
+  <meta name="description" content="Email Copywriter for AI SaaS — Testing AI @ Meta Superintelligence Labs. Portfolio of email sequences, landing pages, and ad copy for AI products.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="site-name">[Your Name]</div>
+        <div class="site-tagline">
+          <strong>Email Copywriter for AI SaaS</strong> — Testing AI @ Meta Superintelligence Labs
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="bio-section">
+      <div class="container">
+        <div class="bio-text">
+          <!-- Replace the paragraph below with your 3-sentence bio -->
+          <p>[BIO PLACEHOLDER — replace this with your 3-sentence bio that establishes the QA-to-copywriter angle. Sentence one: where you come from. Sentence two: what that gives you. Sentence three: who you write for now.]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Email Sequences ── -->
+    <section class="portfolio-section" id="email-sequences">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Email Sequences</h2>
+          <span class="section-count" id="seq-count">1 piece</span>
+        </div>
+        <div class="card-grid" id="sequence-cards">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Landing Pages ── -->
+    <section class="portfolio-section" id="landing-pages">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Landing Pages</h2>
+          <span class="section-count">Coming soon</span>
+        </div>
+        <div class="card-grid">
+          <div class="card card--locked" aria-label="Coming soon">
+            <div class="card-lock">🔒</div>
+            <div class="card-title">Coming Soon</div>
+            <div class="card-description">Landing page samples in progress.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Ads ── -->
+    <section class="portfolio-section" id="ads">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Ads</h2>
+          <span class="section-count">Coming soon</span>
+        </div>
+        <div class="card-grid">
+          <div class="card card--locked" aria-label="Coming soon">
+            <div class="card-lock">🔒</div>
+            <div class="card-title">Coming Soon</div>
+            <div class="card-description">Ad copy samples in progress.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-cta">Working on something?</p>
+        <a class="footer-email" href="mailto:[your-email-here]">[your-email-here]</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="emails.js"></script>
+  <script>
+    const grid = document.getElementById('sequence-cards');
+    const countEl = document.getElementById('seq-count');
+
+    countEl.textContent = sequences.length === 1
+      ? '1 piece'
+      : `${sequences.length} pieces`;
+
+    sequences.forEach(seq => {
+      const card = document.createElement('a');
+      card.className = 'card';
+      card.href = `sequence.html?seq=${seq.id}`;
+      card.innerHTML = `
+        <div class="card-tags">${seq.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="card-title">${seq.title}</div>
+        <div class="card-description">${seq.description}</div>
+        <div class="card-arrow">View sequence <span>→</span></div>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
