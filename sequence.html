@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Sequence Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Page-specific overrides */
+    body { background: var(--gray-100); }
+  </style>
+</head>
+<body class="viewer-body">
+
+  <!-- Top nav bar -->
+  <div class="viewer-header">
+    <a href="index.html" class="viewer-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8.5 2.5L4 7L8.5 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back to portfolio
+    </a>
+    <span class="viewer-title" id="viewer-title"></span>
+  </div>
+
+  <!-- Two-panel layout -->
+  <div class="viewer-layout">
+
+    <!-- Left: Inbox sidebar -->
+    <aside class="inbox-sidebar" id="inbox-sidebar">
+      <div class="inbox-header">Inbox</div>
+      <!-- Items injected by JS -->
+    </aside>
+
+    <!-- Right: Reading pane -->
+    <main class="reading-pane" id="reading-pane">
+      <!-- Email card injected by JS -->
+    </main>
+
+  </div>
+
+  <script src="emails.js"></script>
+  <script>
+    // ── Resolve sequence from ?seq= param ──────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const seqId  = params.get('seq') || (sequences[0] && sequences[0].id);
+    const seq    = sequences.find(s => s.id === seqId) || sequences[0];
+
+    if (!seq) {
+      document.body.innerHTML = '<p style="padding:40px;color:#64748b;">Sequence not found.</p>';
+      throw new Error('No sequence data');
+    }
+
+    document.title = seq.title + ' — Email Viewer';
+    document.getElementById('viewer-title').textContent = seq.title;
+
+    // ── Build inbox items ───────────────────────────────────────────────
+    const sidebar = document.getElementById('inbox-sidebar');
+
+    function buildInboxItem(index) {
+      // index -1 = overview
+      const isOverview = index === -1;
+      const item = document.createElement('div');
+      item.className = 'inbox-item' + (isOverview ? ' overview-item' : '');
+      item.dataset.index = index;
+
+      if (isOverview) {
+        item.innerHTML = `
+          <div class="inbox-sender">
+            <span>${seq.sender.name}</span>
+          </div>
+          <div class="inbox-subject">Sequence Overview</div>
+          <div class="inbox-preview">Brief, structure & approach</div>
+        `;
+      } else {
+        const email = seq.emails[index];
+        item.innerHTML = `
+          <div class="inbox-sender">
+            <span>${seq.sender.name}</span>
+            <span class="inbox-date">${email.date}</span>
+          </div>
+          <div class="inbox-subject">${email.subject}</div>
+          <div class="inbox-preview">${email.preview}</div>
+        `;
+      }
+
+      item.addEventListener('click', () => selectItem(index));
+      return item;
+    }
+
+    // Overview first, then emails
+    sidebar.appendChild(buildInboxItem(-1));
+    seq.emails.forEach((_, i) => sidebar.appendChild(buildInboxItem(i)));
+
+    // ── Render email/overview ───────────────────────────────────────────
+    const pane = document.getElementById('reading-pane');
+
+    function selectItem(index) {
+      // Update active state
+      document.querySelectorAll('.inbox-item').forEach(el => {
+        el.classList.toggle('active', parseInt(el.dataset.index) === index);
+      });
+
+      if (index === -1) {
+        renderOverview();
+      } else {
+        renderEmail(seq.emails[index]);
+      }
+      pane.scrollTop = 0;
+    }
+
+    function renderOverview() {
+      const ov = seq.overview;
+      pane.innerHTML = `
+        <div class="email-card overview-card">
+          <div class="email-header">
+            <div class="email-subject" style="font-size:17px;color:#64748b;font-weight:500;margin-bottom:0;">Overview</div>
+          </div>
+          <div class="email-body">${ov.body}</div>
+        </div>
+      `;
+    }
+
+    function renderEmail(email) {
+      const notesHtml = email.notes ? `
+        <div class="notes-section">
+          <button class="notes-toggle" aria-expanded="false" onclick="toggleNotes(this)">
+            <span class="notes-toggle-icon">▶</span>
+            Copywriter's Notes
+          </button>
+          <div class="notes-body">
+            <div class="notes-label">✏ Copywriter's Notes</div>
+            ${email.notes}
+          </div>
+        </div>
+      ` : '';
+
+      pane.innerHTML = `
+        <div class="email-card">
+          <div class="email-header">
+            <div class="email-meta">
+              <div class="avatar">${seq.sender.avatar}</div>
+              <div class="email-meta-text">
+                <div class="email-from">
+                  ${seq.sender.name}
+                  <span class="email-from-address">&lt;${seq.sender.email}&gt;</span>
+                </div>
+                <div class="email-meta-date">${email.date}</div>
+              </div>
+            </div>
+            <div class="email-subject">${email.subject}</div>
+            ${email.day ? `<div class="email-day-label">${email.day}</div>` : ''}
+          </div>
+          <div class="email-body">${email.body}</div>
+        </div>
+        ${notesHtml}
+      `;
+    }
+
+    function toggleNotes(btn) {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      const body = btn.nextElementSibling;
+      body.classList.toggle('open', !expanded);
+    }
+    // Expose globally for onclick
+    window.toggleNotes = toggleNotes;
+
+    // ── Load overview by default ────────────────────────────────────────
+    selectItem(-1);
+  </script>
+</body>
+</html>
