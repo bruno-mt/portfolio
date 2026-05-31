@@ -7,7 +7,7 @@
 **Body:**
 
 📷 A morning walk through Alfama’s labyrinthine alleys.  
-🌇 Watching the sunset from {Bar name’s} rooftop bar.  
+🌇 Watching the sunset from Memmo Alfama's rooftop bar.  
 🍴 *Pasteís de bacalhau* in downtown Baixa.
 
 You were planning all of this just two days ago…
