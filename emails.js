@@ -31,7 +31,7 @@ const sequences = [
         day: "Day 0 — 48 hrs after itinerary creation",
         body: `
           <p>📷 A morning walk through Alfama's labyrinthine alleys.<br>
-          🌇 Watching the sunset from {Bar name's} rooftop bar.<br>
+          🌇 Watching the sunset from Memmo Alfama's rooftop bar.<br>
           🍴 <em>Pastéis de bacalhau</em> in downtown Baixa.</p>
           <p>You were planning all of this just two days ago…</p>
           <p>You just haven't booked yet.</p>
