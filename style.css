@@ -2,50 +2,86 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --navy: #0f172a;
-  --navy-800: #1e293b;
-  --navy-700: #334155;
-  --navy-600: #475569;
-  --blue: #3b82f6;
-  --blue-hover: #2563eb;
+  /* Fixed palette — not theme-sensitive */
   --white: #ffffff;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
   --gray-200: #e2e8f0;
-  --gray-400: #94a3b8;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --text: #0f172a;
-  --text-muted: #64748b;
+  --text: #0f172a;           /* always-dark text for email cards (white bg in both modes) */
+  --text-muted: #64748b;     /* always-dark muted text for email cards */
   --note-bg: #fefce8;
   --note-border: #fde68a;
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,.12);
   --font: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* ── Theme variables — dark mode defaults ── */
+  --t-accent:                #3b82f6;
+  --t-accent-hover:          #2563eb;
+  --t-accent-rgb:            59, 130, 246;
+  --t-page-bg:               #0f172a;
+  --t-page-border:           #1e293b;
+  --t-header-bg:             #0f172a;
+  --t-header-border:         #1e293b;
+  --t-card-bg:               #1e293b;
+  --t-card-border:           #334155;
+  --t-page-text:             #ffffff;
+  --t-page-text-muted:       #94a3b8;
+  --t-viewer-header-bg:      #0f172a;
+  --t-viewer-header-border:  #1e293b;
+  --t-viewer-chrome-text:    #ffffff;
+  --t-viewer-chrome-muted:   #94a3b8;
+  --t-inbox-bg:              #ffffff;
+  --t-inbox-item-hover:      #f8fafc;
+  --t-reading-pane-bg:       #f1f5f9;
+}
+
+/* ── Light mode overrides ── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --t-accent:                #2563eb;
+    --t-accent-hover:          #1d4ed8;
+    --t-accent-rgb:            37, 99, 235;
+    --t-page-bg:               #f8fafc;
+    --t-page-border:           #e2e8f0;
+    --t-header-bg:             #ffffff;
+    --t-header-border:         #e2e8f0;
+    --t-card-bg:               #ffffff;
+    --t-card-border:           #e2e8f0;
+    --t-page-text:             #0f172a;
+    --t-page-text-muted:       #64748b;
+    --t-viewer-header-bg:      #ffffff;
+    --t-viewer-header-border:  #e2e8f0;
+    --t-viewer-chrome-text:    #0f172a;
+    --t-viewer-chrome-muted:   #64748b;
+    --t-inbox-bg:              #f1f5f9;
+    --t-inbox-item-hover:      #e8edf3;
+    --t-reading-pane-bg:       #ffffff;
+  }
 }
 
 html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font);
-  background: var(--navy);
-  color: var(--white);
+  background: var(--t-page-bg);
+  color: var(--t-page-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--blue); text-decoration: none; }
-a:hover { color: var(--blue-hover); }
+a { color: var(--t-accent); text-decoration: none; }
+a:hover { color: var(--t-accent-hover); }
 
 /* ─── Layout ─── */
 .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
 /* ─── Header ─── */
 .site-header {
+  background: var(--t-header-bg);
   padding: 56px 0 64px;
-  border-bottom: 1px solid var(--navy-800);
+  border-bottom: 1px solid var(--t-header-border);
 }
 
 .header-inner { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; }
@@ -57,34 +93,34 @@ a:hover { color: var(--blue-hover); }
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: var(--white);
+  color: var(--t-page-text);
 }
 
 .site-tagline {
   font-size: 15px;
-  color: var(--gray-400);
+  color: var(--t-page-text-muted);
   font-weight: 400;
 }
 
 .site-tagline strong {
-  color: var(--blue);
+  color: var(--t-accent);
   font-weight: 500;
 }
 
 /* ─── Bio ─── */
-.bio-section { padding: 56px 0 48px; border-bottom: 1px solid var(--navy-800); }
+.bio-section { padding: 56px 0 48px; border-bottom: 1px solid var(--t-page-border); }
 
 .bio-text {
   max-width: 640px;
   font-size: 16px;
-  color: var(--gray-400);
+  color: var(--t-page-text-muted);
   line-height: 1.75;
 }
 
 .bio-text p + p { margin-top: 12px; }
 
 /* ─── Portfolio Sections ─── */
-.portfolio-section { padding: 56px 0; border-bottom: 1px solid var(--navy-800); }
+.portfolio-section { padding: 56px 0; border-bottom: 1px solid var(--t-page-border); }
 .portfolio-section:last-of-type { border-bottom: none; }
 
 .section-header {
@@ -97,12 +133,12 @@ a:hover { color: var(--blue-hover); }
 .section-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--white);
+  color: var(--t-page-text);
 }
 
 .section-count {
   font-size: 13px;
-  color: var(--gray-600);
+  color: var(--t-page-text-muted);
 }
 
 /* ─── Card Grid ─── */
@@ -113,8 +149,8 @@ a:hover { color: var(--blue-hover); }
 }
 
 .card {
-  background: var(--navy-800);
-  border: 1px solid var(--navy-700);
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-card-border);
   border-radius: var(--radius);
   padding: 24px;
   cursor: pointer;
@@ -125,9 +161,9 @@ a:hover { color: var(--blue-hover); }
 }
 
 .card:hover {
-  border-color: var(--blue);
+  border-color: var(--t-accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(59,130,246,.12);
+  box-shadow: 0 8px 32px rgba(var(--t-accent-rgb), .12);
   color: inherit;
 }
 
@@ -141,9 +177,9 @@ a:hover { color: var(--blue-hover); }
 .tag {
   font-size: 11px;
   font-weight: 500;
-  color: var(--blue);
-  background: rgba(59,130,246,.1);
-  border: 1px solid rgba(59,130,246,.2);
+  color: var(--t-accent);
+  background: rgba(var(--t-accent-rgb), .1);
+  border: 1px solid rgba(var(--t-accent-rgb), .2);
   border-radius: 4px;
   padding: 2px 8px;
   letter-spacing: .3px;
@@ -153,14 +189,14 @@ a:hover { color: var(--blue-hover); }
 .card-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--white);
+  color: var(--t-page-text);
   margin-bottom: 8px;
   line-height: 1.4;
 }
 
 .card-description {
   font-size: 13px;
-  color: var(--gray-400);
+  color: var(--t-page-text-muted);
   line-height: 1.6;
 }
 
@@ -171,7 +207,7 @@ a:hover { color: var(--blue-hover); }
   margin-top: 16px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--blue);
+  color: var(--t-accent);
 }
 
 /* ─── Placeholder Card ─── */
@@ -181,7 +217,7 @@ a:hover { color: var(--blue-hover); }
 }
 
 .card.card--locked:hover {
-  border-color: var(--navy-700);
+  border-color: var(--t-card-border);
   transform: none;
   box-shadow: none;
 }
@@ -195,7 +231,7 @@ a:hover { color: var(--blue-hover); }
 /* ─── Footer ─── */
 .site-footer {
   padding: 48px 0;
-  border-top: 1px solid var(--navy-800);
+  border-top: 1px solid var(--t-page-border);
   margin-top: 8px;
 }
 
@@ -207,12 +243,12 @@ a:hover { color: var(--blue-hover); }
 
 .footer-cta {
   font-size: 16px;
-  color: var(--gray-400);
+  color: var(--t-page-text-muted);
 }
 
 .footer-email {
   font-size: 14px;
-  color: var(--blue);
+  color: var(--t-accent);
 }
 
 /* ════════════════════════════════
@@ -231,22 +267,22 @@ a:hover { color: var(--blue-hover); }
    EMAIL VIEWER PAGE
 ════════════════════════════════ */
 .viewer-body {
-  background: var(--gray-100);
+  background: var(--t-reading-pane-bg);
   color: var(--text);
   min-height: 100vh;
 }
 
 .viewer-header {
-  background: var(--navy);
+  background: var(--t-viewer-header-bg);
   padding: 16px 24px;
   display: flex;
   align-items: center;
   gap: 20px;
-  border-bottom: 1px solid var(--navy-800);
+  border-bottom: 1px solid var(--t-viewer-header-border);
 }
 
 .viewer-back {
-  color: var(--gray-400);
+  color: var(--t-viewer-chrome-muted);
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -254,12 +290,12 @@ a:hover { color: var(--blue-hover); }
   text-decoration: none;
   transition: color .15s;
 }
-.viewer-back:hover { color: var(--white); }
+.viewer-back:hover { color: var(--t-viewer-chrome-text); }
 
 .viewer-title {
   font-size: 14px;
   font-weight: 500;
-  color: var(--white);
+  color: var(--t-viewer-chrome-text);
 }
 
 .viewer-layout {
@@ -270,7 +306,7 @@ a:hover { color: var(--blue-hover); }
 
 /* ─── Inbox Sidebar ─── */
 .inbox-sidebar {
-  background: var(--white);
+  background: var(--t-inbox-bg);
   border-right: 1px solid var(--gray-200);
   overflow-y: auto;
   display: flex;
@@ -296,11 +332,11 @@ a:hover { color: var(--blue-hover); }
   position: relative;
 }
 
-.inbox-item:hover { background: var(--gray-50); }
+.inbox-item:hover { background: var(--t-inbox-item-hover); }
 
 .inbox-item.active {
   background: #eff6ff;
-  border-left: 3px solid var(--blue);
+  border-left: 3px solid var(--t-accent);
 }
 
 .inbox-item.overview-item { background: var(--gray-50); }
@@ -344,7 +380,7 @@ a:hover { color: var(--blue-hover); }
 .reading-pane {
   overflow-y: auto;
   padding: 32px;
-  background: var(--gray-100);
+  background: var(--t-reading-pane-bg);
 }
 
 .email-card {
@@ -372,7 +408,7 @@ a:hover { color: var(--blue-hover); }
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--blue);
+  background: var(--t-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -414,8 +450,8 @@ a:hover { color: var(--blue-hover); }
 .email-day-label {
   font-size: 11px;
   font-weight: 500;
-  color: var(--blue);
-  background: rgba(59,130,246,.08);
+  color: var(--t-accent);
+  background: rgba(var(--t-accent-rgb), .08);
   border-radius: 4px;
   padding: 2px 8px;
   display: inline-block;
@@ -441,7 +477,7 @@ a:hover { color: var(--blue-hover); }
 
 a.cta-button {
   display: inline-block;
-  background: var(--blue);
+  background: var(--t-accent);
   color: var(--white) !important;
   padding: 12px 22px;
   border-radius: var(--radius-sm);
@@ -451,7 +487,7 @@ a.cta-button {
   transition: background .15s;
 }
 
-a.cta-button:hover { background: var(--blue-hover); }
+a.cta-button:hover { background: var(--t-accent-hover); }
 
 /* ─── Overview card ─── */
 .overview-card .email-header { background: var(--gray-50); }
