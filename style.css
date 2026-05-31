@@ -48,7 +48,10 @@ a:hover { color: var(--blue-hover); }
   border-bottom: 1px solid var(--navy-800);
 }
 
-.header-inner { display: flex; flex-direction: column; gap: 12px; }
+.header-inner { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; }
+.header-text { display: flex; flex-direction: column; gap: 12px; }
+.header-photo { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+@media (max-width: 768px) { .header-photo { display: none; } }
 
 .site-name {
   font-size: 26px;
